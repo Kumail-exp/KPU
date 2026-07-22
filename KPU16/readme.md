@@ -6,6 +6,7 @@
 
 This project is a custom  CPU architecture intended to be implemented in python. The goal is to create a clean, modern ISA while remaining simple enough to understand completely.
 
+>it will not simulate on lower level and wil work with very abstactions just to simulate a machine code running machine
 ## Current Design Decisions
 
 ### Architecture
