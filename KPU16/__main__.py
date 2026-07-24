@@ -39,13 +39,12 @@ class CPU:
         if(opcode<16):
             self.registers[addr1]=self.alu.execute(self.registers[addr2],self.registers[addr3],opcode)
             return self.pc+1
-        match(opcode):
-            case 16:
+        elif opcode==16:
                 self.registers[addr1]=to_num(other,size=16,two_complement=True)
                 return self.pc+1
-            case 17:
+        elif opcode== 17:
                 return to_num(other,size=16)
-            case 18:
+        elif opcode== 18:
                 flags=['z','n','c','v']
                 # it will have an and gate option too if other addr2 has a value then then it will and before doing anything
                 if(addr2!=0):
@@ -56,10 +55,10 @@ class CPU:
                     if(self.alu.Flags[flags[addr1-1]] ):
                         return to_num(other,size=16)
                 return self.pc+1
-            case 19:
+        elif opcode== 19:
                 print(self.registers[addr1])
                 return self.pc+1
-            case _:
+        else:
                 raise ValueError(f'this opcode {opcode} is not yet defined')
         return self.pc+1
     def give_ins(self,instructions:list[list[int]]):
@@ -79,15 +78,18 @@ if __name__=='__main__':
     ins=[
         [16,1,0]+to_stream(1,16),
         [16,2,0]+to_stream(1,16),
-        [16,3,0]+to_stream(100,16),
-        [19,1,0]+to_stream(0,16),
+        [16,3,0]+to_stream(10000,16),
+        # [19,1,0]+to_stream(0,16),
         [0,1,2]+to_stream(1,5)+[0]*11,
         [1,0,3]+to_stream(1,5)+[0]*11,
         [18,2,0]+to_stream(8,16),
         [17,0,0]+to_stream(3,16),
     ]
     cpu=CPU()
-    cpu.give_ins(ins)
-    cpu.run()
+    for i in range(100):
+        cpu.give_ins(ins)
+        cpu.run()
     print(f'time in nanosecond {time.time_ns()-start}') 
-    #takes around 5000000 nanoseconds or 5 milliseconds
+    # pypy-around 6x10^7 ns
+    # cpython-around 2x10^8 ns
+    # note to my future self: please double check whoever runs it faster
