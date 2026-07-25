@@ -29,6 +29,7 @@ class CPU:
         self.registers:list[int]=[0 for i in range(32)]
         self.memory={}#memory is too large to pre allocate so we allocate it at runtime lwk
         self.alu=ALU()
+        self.running=True
     def execute(self,instruction:list[int]):
         # for alu based operations:
         opcode=instruction[0]
@@ -38,10 +39,8 @@ class CPU:
         addr3=to_num(other[:5])
         if(opcode<16):
             self.registers[addr1]=self.alu.execute(self.registers[addr2],self.registers[addr3],opcode)
-            return self.pc+1
         elif opcode==16:
                 self.registers[addr1]=to_num(other,size=16,two_complement=True)
-                return self.pc+1
         elif opcode== 17:
                 return to_num(other,size=16)
         elif opcode== 18:
@@ -54,17 +53,33 @@ class CPU:
                 else:
                     if(self.alu.Flags[flags[addr1-1]] ):
                         return to_num(other,size=16)
-                return self.pc+1
         elif opcode== 19:
                 print(self.registers[addr1])
-                return self.pc+1
+        elif opcode==20:
+            #load
+            self.registers[addr1]=self.memory.get(self.registers[addr2],default=0)
+        elif opcode==21:
+            self.memory[self.registers[addr1]]=self.registers[addr2]
+        elif opcode==22:
+            #  cmp
+            self.alu.execute(self.registers[addr2],self.registers[addr3],opcode=1)
+        elif opcode==23:
+            #  mov
+            self.registers[addr1]=self.registers[addr2]
+        elif opcode==24:
+            # no op
+            pass
+        elif opcode==25:
+            #  halt
+            self.running=False
         else:
                 raise ValueError(f'this opcode {opcode} is not yet defined')
         return self.pc+1
     def give_ins(self,instructions:list[list[int]]):
         self.instructions=instructions
     def run(self):
-        while self.pc<len(self.instructions) and self.pc>=0:
+        self.running=True
+        while self.pc<len(self.instructions) and self.pc>=0 and self.running:
             # print(self.pc)
             self.pc=self.execute(self.instructions[self.pc])
         self.instructions=[[]]
@@ -86,10 +101,15 @@ if __name__=='__main__':
         [17,0,0]+to_stream(3,16),
     ]
     cpu=CPU()
-    for i in range(100):
+    for i in range(1000000):
         cpu.give_ins(ins)
         cpu.run()
-    print(f'time in nanosecond {time.time_ns()-start}') 
-    # pypy-around 6x10^7 ns
-    # cpython-around 2x10^8 ns
+    print(f'time in millisecond {(time.time_ns()-start)/1000000}') 
+
+    # KPU$ python KPU16/
+    # time in millisecond 874.412104
+    # /KPU$ pypy3 KPU16/
+    # time in millisecond 81.812964
+
+
     # note to my future self: please double check whoever runs it faster
