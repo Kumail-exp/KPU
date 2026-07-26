@@ -31,6 +31,7 @@ class CPU:
         self.alu=ALU()
         self.running=True
     def execute(self,instruction:list[int]):
+        # print(instruction)
         # for alu based operations:
         opcode=instruction[0]
         addr1=instruction[1]
@@ -90,26 +91,32 @@ if __name__=='__main__':
     # just a simple adder lol
     import time
     start=time.time_ns()
+    # should print 7x6=42
     ins=[
-        [16,1,0]+to_stream(1,16),
-        [16,2,0]+to_stream(1,16),
-        [16,3,0]+to_stream(10000,16),
-        # [19,1,0]+to_stream(0,16),
-        [0,1,2]+to_stream(1,5)+[0]*11,
-        [1,0,3]+to_stream(1,5)+[0]*11,
-        [18,2,0]+to_stream(8,16),
-        [17,0,0]+to_stream(3,16),
+        [16, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0],
+        [16, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1],
+        [16, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [16, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [16, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 3, 3, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 5, 5, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [1, 6, 5, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [18, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0],
+        [17, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1],
+        [19, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [25, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     ]
+
+    
     cpu=CPU()
-    for i in range(1000000):
-        cpu.give_ins(ins)
-        cpu.run()
+    cpu.give_ins(ins)
+    cpu.run()
     print(f'time in millisecond {(time.time_ns()-start)/1000000}') 
 
     # KPU$ python KPU16/
-    # time in millisecond 874.412104
+    # time in millisecond 0.307288
     # /KPU$ pypy3 KPU16/
-    # time in millisecond 81.812964
+    # time in millisecond 0.883985
 
 
     # note to my future self: please double check whoever runs it faster

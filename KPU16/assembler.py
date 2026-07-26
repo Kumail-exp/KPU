@@ -1,0 +1,155 @@
+OPCODES = {
+    'add': 0,
+    'sub': 1,
+    'mult': 2,
+    'div': 3,
+    'mod': 4,
+    'and': 5,
+    'or': 6,
+    'xor': 7,
+    'not': 8,
+    'shl': 9,
+    'shr': 10,
+    'sar': 11,
+    'rol': 12,
+    'ror': 13,
+    'min': 14,
+    'max': 15,
+    'ldi': 16,
+    'jump': 17,
+    'jc': 18,
+    'display': 19,
+    'load': 20,
+    'store': 21,
+    'cmp': 22,
+    'mov': 23,
+    'nop': 24,
+    'halt': 25,
+    }
+
+def reg_adress(addr:str):
+    return int(addr[1:])%32
+def to_stream(num:int,size=16):
+    b=bin(num)[2:]
+    binary=[0]*size
+    for i in range(len(b)):
+        binary[size-len(b)+i]=int(b[i])
+    return binary
+class Assembler:
+    def __init__(self,code:str):
+        self.code:list[str]=[]
+        for i in code.split('\n'):
+            self.code.append(i)
+        self.labels:dict[str,int]={}
+    def preprocess(self) -> list[str]:
+        nc = []
+        for instruction in self.code:
+            instruction = instruction.split('#')[0].strip()
+
+            if not instruction:
+                continue
+
+            if instruction.startswith('.'):
+                self.labels[instruction[1:]] = len(nc)
+                continue
+
+            nc.append(instruction.lower())
+
+        self.code = nc
+        return nc
+    def translate(self,line:str)->list[int]:
+        tokens=line.split(' ')
+        # print(tokens)
+        opcode=tokens[0]
+        # 3 input ones
+        if(opcode in [  'add',
+                        'sub',
+                        'mult',
+                        'div',
+                        'mod',
+                        'and',
+                        'or',
+                        'xor',
+                        'min',
+                        'max',
+                        ]):
+            return [OPCODES[opcode],reg_adress(tokens[1]),reg_adress(tokens[2])]+to_stream(reg_adress(tokens[3]),5)+[0]*11
+        #two input oens
+        if (opcode in [
+                        'load',
+                        'store',
+                        'cmp',
+                        'mov',
+                        'not',
+                        'shl',
+                        'shr',
+                        'sar',
+                        'rol',
+                        'ror'
+                            ]):
+            return [OPCODES[opcode],reg_adress(tokens[1]),reg_adress(tokens[2])]+[0]*16
+        # specific ones:
+        if(opcode=='ldi'):
+            return [OPCODES[opcode],reg_adress(tokens[1]),0]+to_stream(int(tokens[2]))
+        if(opcode=='jump'):
+                    try:
+                        if tokens[1].startswith('.'):
+                            value=self.labels[tokens[1][1:]] 
+                        else:
+                            value=int(tokens[1])
+                    except Exception as e:
+                        print(e)
+                        raise ValueError(f'invalid argument to jump->\'{tokens[1]}\'')
+                    return [OPCODES[opcode]]+[0]*2+to_stream(value)
+        if(opcode=='jc'):
+                            flag_code={'z':1,'n':2,'c':3,'v':4}
+                            
+                            try:
+                                if tokens[2][0]=='.':
+                                    value=self.labels[tokens[2][1:]] 
+                                else:
+                                    value=int(tokens[2])
+                                fc=flag_code[tokens[1]]
+                            except Exception as e:
+                                print(e)
+                                raise ValueError(f'invalid argument to jump->\'{tokens[2]}\'')
+                            return [OPCODES[opcode],fc,0]+to_stream(value)      
+        # one argument ones:
+        if opcode in ['display']:
+             return [OPCODES[opcode],reg_adress(tokens[1]),0]+[0]*16
+        # no argumented ones
+        if opcode in ['halt','nop']:
+             return [OPCODES[opcode],0,0]+[0]*16
+    
+    def assemble(self):
+        self.preprocess()
+        out=[]
+        for line in self.code:
+            o=self.translate(line)
+            if o:
+                out.append(o)
+        return out
+
+if __name__=='__main__':
+    # reusing my old multiplication code
+    asm=Assembler('''ldi r1 6
+ldi r2 7
+ldi r3 0
+ldi r4 1
+ldi r5 0
+
+.loop
+add r3 r3 r1
+add r5 r5 r4
+
+sub r6 r5 r2
+jc Z .end
+
+jump .loop
+
+.end
+display r3
+halt''')
+    mc=asm.assemble()
+    for l in mc:
+        print(l)
