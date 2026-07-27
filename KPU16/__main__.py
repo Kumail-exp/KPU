@@ -66,7 +66,7 @@ class CPU:
             self.memory[self.registers[addr1]]=self.registers[addr2]
         elif opcode==22:
             #  cmp
-            self.alu.execute(self.registers[addr2],self.registers[addr3],opcode=1)
+            self.alu.execute(self.registers[addr1],self.registers[addr2],opcode=1)
         elif opcode==23:
             #  mov
             self.registers[addr1]=self.registers[addr2]

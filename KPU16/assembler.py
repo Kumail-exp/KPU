@@ -25,7 +25,7 @@ OPCODES = {
     'mov': 23,
     'nop': 24,
     'halt': 25,
-    'input':26
+    'read':26
     }
 
 def reg_adress(addr:str):
@@ -55,7 +55,7 @@ class Assembler:
                 continue
 
             nc.append(instruction.lower())
-
+        # print(self.labels)
         self.code = nc
         return nc
     def translate(self,line:str)->list[int]:
@@ -116,19 +116,21 @@ class Assembler:
                                 raise ValueError(f'invalid argument to jump->\'{tokens[2]}\'')
                             return [OPCODES[opcode],fc,0]+to_stream(value)      
         # one argument ones:
-        if opcode in ['display','input']:
+        if opcode in ['display','read']:
              return [OPCODES[opcode],reg_adress(tokens[1]),0]+[0]*16
         # no argumented ones
         if opcode in ['halt','nop']:
              return [OPCODES[opcode],0,0]+[0]*16
     
-    def assemble(self)->list[list[int]]:
+    def assemble(self,debug_mode=False)->list[list[int]]:
         '''no need for anything this just returns the perfectly done machine code'''
         self.preprocess()
         out=[]
         for line in self.code:
             o=self.translate(line)
             if o:
+                if debug_mode:
+                     print(f'{line}-->{o}')
                 out.append(o)
         return out
 
@@ -145,9 +147,10 @@ if __name__=='__main__':
     with open(input_file) as f:
         source = f.read()
     obj=Assembler(source)
-    mc=obj.assemble()
+    mc=obj.assemble(False)
 
     machine_code =str(mc)
 
     with open(out, "w") as f:
         f.write(machine_code)
+    print(f'program assebled succesfully into {out}')
