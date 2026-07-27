@@ -1,4 +1,7 @@
 from ALU import *
+import ast
+import sys
+from pathlib import Path
 # some filler functiuons
 def to_stream(num:int,size=8):
     b=bin(num)[2:]
@@ -90,34 +93,16 @@ class CPU:
 
 
 if __name__=='__main__':
-    # just a simple adder lol
-    import time
-    start=time.time_ns()
-    # should print 7x6=42
-    ins=[[26, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [26, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [16, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [16, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-        [16, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 3, 3, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 5, 5, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [1, 6, 5, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [18, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0],
-        [17, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1],
-        [19, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [25, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-]
 
+        if len(sys.argv) != 2:
+            print("u cant even use a basic program")
+            sys.exit(1)
+
+        input_file = Path("dotkpu") / sys.argv[1]
+        with open(input_file) as f:
+            source = f.read()
+        ins = ast.literal_eval(source)
+        cpu=CPU()
+        cpu.give_ins(ins)
+        cpu.run()
     
-    cpu=CPU()
-    cpu.give_ins(ins)
-    cpu.run()
-    print(f'time in millisecond {(time.time_ns()-start)/1000000}') 
-
-    # KPU$ python KPU16/
-    # time in millisecond 0.307288
-    # /KPU$ pypy3 KPU16/
-    # time in millisecond 0.883985
-
-
-    # note to my future self: please double check whoever runs it faster

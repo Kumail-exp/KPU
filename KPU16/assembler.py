@@ -122,7 +122,8 @@ class Assembler:
         if opcode in ['halt','nop']:
              return [OPCODES[opcode],0,0]+[0]*16
     
-    def assemble(self):
+    def assemble(self)->list[list[int]]:
+        '''no need for anything this just returns the perfectly done machine code'''
         self.preprocess()
         out=[]
         for line in self.code:
@@ -132,25 +133,21 @@ class Assembler:
         return out
 
 if __name__=='__main__':
-    # reusing my old multiplication code
-    asm=Assembler('''input r1
-input r2
-ldi r3 0
-ldi r4 1
-ldi r5 0
+    import sys
+    from pathlib import Path
 
-.loop
-add r3 r3 r1
-add r5 r5 r4
+    if len(sys.argv) != 2:
+        print("use the correct format")
+        sys.exit(1)
 
-sub r6 r5 r2
-jc Z .end
+    input_file = Path("dotasm") / sys.argv[1]
+    out = Path("dotkpu") / input_file.with_suffix(".kpu").name
+    with open(input_file) as f:
+        source = f.read()
+    obj=Assembler(source)
+    mc=obj.assemble()
 
-jump .loop
+    machine_code =str(mc)
 
-.end
-display r3
-halt''')
-    mc=asm.assemble()
-    for l in mc:
-        print(l)
+    with open(out, "w") as f:
+        f.write(machine_code)
