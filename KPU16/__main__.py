@@ -61,7 +61,7 @@ class CPU:
                 print(self.registers[addr1])
         elif opcode==20:
             #load
-            self.registers[addr1]=self.memory.get(self.registers[addr2],default=0)
+            self.registers[addr1]=self.memory.get(self.registers[addr2],0)
         elif opcode==21:
             self.memory[self.registers[addr1]]=self.registers[addr2]
         elif opcode==22:
