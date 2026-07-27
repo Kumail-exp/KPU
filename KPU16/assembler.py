@@ -25,6 +25,7 @@ OPCODES = {
     'mov': 23,
     'nop': 24,
     'halt': 25,
+    'input':26
     }
 
 def reg_adress(addr:str):
@@ -115,7 +116,7 @@ class Assembler:
                                 raise ValueError(f'invalid argument to jump->\'{tokens[2]}\'')
                             return [OPCODES[opcode],fc,0]+to_stream(value)      
         # one argument ones:
-        if opcode in ['display']:
+        if opcode in ['display','input']:
              return [OPCODES[opcode],reg_adress(tokens[1]),0]+[0]*16
         # no argumented ones
         if opcode in ['halt','nop']:
@@ -132,8 +133,8 @@ class Assembler:
 
 if __name__=='__main__':
     # reusing my old multiplication code
-    asm=Assembler('''ldi r1 6
-ldi r2 7
+    asm=Assembler('''input r1
+input r2
 ldi r3 0
 ldi r4 1
 ldi r5 0

@@ -14,7 +14,6 @@ This project is a custom  CPU architecture intended to be implemented in python.
 - Harvard architecture
 - Load/store architecture
 - Fixed-width **32-bit instructions**
-- Little-endian
 - Instruction-based I/O (port I/O)
 
 ### Registers
