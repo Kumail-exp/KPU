@@ -28,7 +28,9 @@ OPCODES = {
     'read':26,
     'gettime':27,
     'print':28,
-    'println':29
+    'println':29,
+    'mousex':30,
+    'mousey':31
     }
 def ascii_val(char: str):
     if len(char) != 1:
@@ -131,7 +133,7 @@ class Assembler:
                                 raise ValueError(f'invalid argument to jump->\'{tokens[2]}\'')
                             return [OPCODES[opcode],fc,0]+to_stream(value)      
         # one argument ones:
-        if opcode in ['display','read','gettime','print','println']:
+        if opcode in ['display','read','gettime','print','println','mousex','mousey']:
              return [OPCODES[opcode],reg_adress(tokens[1]),0]+[0]*16
         # no argumented ones
         if opcode in ['halt','nop']:

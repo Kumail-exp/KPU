@@ -3,6 +3,10 @@ import ast
 import sys
 from pathlib import Path
 import time
+from pynput.mouse import Controller
+mouse = Controller()
+
+
 # some filler functiuons
 def to_stream(num:int,size=8):
     b=bin(num)[2:]
@@ -83,6 +87,8 @@ class CPU:
              self.registers[addr1] = int(time.monotonic() * 1000) & 0xFFFF
         elif opcode==28 or opcode==29:
              print(chr(self.registers[addr1]),end=('' if opcode==28 else '\n'))
+        elif opcode==30 or opcode==31:
+             self.registers[addr1]=mouse.position[0 if opcode==30 else 1]
         else:
                 raise ValueError(f'this opcode {opcode} is not yet defined')
         return self.pc+1
