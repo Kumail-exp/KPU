@@ -25,7 +25,8 @@ OPCODES = {
     'mov': 23,
     'nop': 24,
     'halt': 25,
-    'read':26
+    'read':26,
+    'gettime':27
     }
 
 def reg_adress(addr:str):
@@ -116,7 +117,7 @@ class Assembler:
                                 raise ValueError(f'invalid argument to jump->\'{tokens[2]}\'')
                             return [OPCODES[opcode],fc,0]+to_stream(value)      
         # one argument ones:
-        if opcode in ['display','read']:
+        if opcode in ['display','read','gettime']:
              return [OPCODES[opcode],reg_adress(tokens[1]),0]+[0]*16
         # no argumented ones
         if opcode in ['halt','nop']:

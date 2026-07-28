@@ -2,6 +2,7 @@ from ALU import *
 import ast
 import sys
 from pathlib import Path
+import time
 # some filler functiuons
 def to_stream(num:int,size=8):
     b=bin(num)[2:]
@@ -78,6 +79,8 @@ class CPU:
             self.running=False
         elif opcode==26:#input
              self.registers[addr1]=int(input('>'))
+        elif opcode == 27:
+             self.registers[addr1] = int(time.monotonic() * 1000) & 0xFFFF
         else:
                 raise ValueError(f'this opcode {opcode} is not yet defined')
         return self.pc+1
