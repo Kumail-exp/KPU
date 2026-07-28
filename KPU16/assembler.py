@@ -26,8 +26,18 @@ OPCODES = {
     'nop': 24,
     'halt': 25,
     'read':26,
-    'gettime':27
+    'gettime':27,
+    'print':28,
+    'println':29
     }
+def ascii_val(char: str):
+    if len(char) != 1:
+        raise ValueError(f'not a single character->\'{char}\'')
+
+    if char.isascii():
+        return ord(char)
+    else:
+        raise ValueError('not a correct ascii')
 
 def reg_adress(addr:str):
     return int(addr[1:])%32
@@ -92,7 +102,11 @@ class Assembler:
             return [OPCODES[opcode],reg_adress(tokens[1]),reg_adress(tokens[2])]+[0]*16
         # specific ones:
         if(opcode=='ldi'):
-            return [OPCODES[opcode],reg_adress(tokens[1]),0]+to_stream(int(tokens[2]))
+            if tokens[2][0]=='\'' and tokens[2][-1]=='\'':
+                 val=ascii_val(tokens[2][1:-1])
+            else:
+                 val=int(tokens[2])
+            return [OPCODES[opcode],reg_adress(tokens[1]),0]+to_stream(val)
         if(opcode=='jump'):
                     try:
                         if tokens[1].startswith('.'):
@@ -117,7 +131,7 @@ class Assembler:
                                 raise ValueError(f'invalid argument to jump->\'{tokens[2]}\'')
                             return [OPCODES[opcode],fc,0]+to_stream(value)      
         # one argument ones:
-        if opcode in ['display','read','gettime']:
+        if opcode in ['display','read','gettime','print','println']:
              return [OPCODES[opcode],reg_adress(tokens[1]),0]+[0]*16
         # no argumented ones
         if opcode in ['halt','nop']:

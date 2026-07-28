@@ -81,6 +81,8 @@ class CPU:
              self.registers[addr1]=int(input('>'))
         elif opcode == 27:
              self.registers[addr1] = int(time.monotonic() * 1000) & 0xFFFF
+        elif opcode==28 or opcode==29:
+             print(chr(self.registers[addr1]),end=('' if opcode==28 else '\n'))
         else:
                 raise ValueError(f'this opcode {opcode} is not yet defined')
         return self.pc+1
