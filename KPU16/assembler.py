@@ -213,6 +213,10 @@ class Assembler:
         '''no need for anything this just returns the perfectly done machine code'''
         self.preprocess()
         self.expand()
+        # print("\n".join(self.code))
+        # since we need to process the labels inside the macros
+        self.preprocess()
+        # print(self.labels)
         out=[]
         for line in self.code:
             o=self.translate(line)
@@ -235,7 +239,7 @@ if __name__=='__main__':
     with open(input_file) as f:
         source = f.read()
     obj=Assembler(source)
-    mc=obj.assemble(False)
+    mc=obj.assemble(0)
 
     machine_code =str(mc)
 
