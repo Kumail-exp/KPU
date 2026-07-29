@@ -49,28 +49,97 @@ def to_stream(num:int,size=16):
     for i in range(len(b)):
         binary[size-len(b)+i]=int(b[i])
     return binary
+class Macro:
+    def __init__(self, args: list[str], code: str):
+        self.args = args
+        self.code = code
+
+    def get_asm(self, values: list[str]) -> str:
+        mapping = dict(zip(self.args, values))
+        return self.code.format(**mapping)
 class Assembler:
     def __init__(self,code:str):
         self.code:list[str]=[]
         for i in code.split('\n'):
             self.code.append(i)
         self.labels:dict[str,int]={}
+        self.macros={}
     def preprocess(self) -> list[str]:
         nc = []
-        for instruction in self.code:
-            instruction = instruction.split('#')[0].strip()
+        i = 0
+        # i have to change the loop format from for loop to while becoz udk it seemed simpler
+
+        while i < len(self.code):
+            instruction = self.code[i].split('#')[0].strip()
 
             if not instruction:
+                i += 1
                 continue
 
             if instruction.startswith('.'):
                 self.labels[instruction[1:]] = len(nc)
+                i += 1
+                continue
+
+            if instruction.startswith('$'):
+                header = instruction[1:]
+
+                name = header[:header.index('(')].strip()
+                args = header[header.index('(')+1:header.index(')')]
+                args = [a.strip() for a in args.split(',') if a.strip()]
+                body = []
+                i += 1
+                while i < len(self.code):
+                    line = self.code[i].split('#')[0].strip()
+                    if line == "}":
+                        break
+                    if line:
+                        body.append(line)
+                    i += 1
+                self.macros[name] = Macro(args, "\n".join(body))
+                i += 1
                 continue
 
             nc.append(instruction.lower())
-        # print(self.labels)
+            i += 1
+
         self.code = nc
         return nc
+    def expand(self) -> list[str]:
+
+        expanded = []
+
+        for line in self.code:
+            line = line.strip()
+
+            if '(' not in line or not line.endswith(')'):
+                expanded.append(line)
+                continue
+
+            name = line[:line.index('(')].strip()
+
+            if name not in self.macros:
+                expanded.append(line)
+                continue
+
+            argstr = line[line.index('(')+1:-1]
+
+            args = []
+            if argstr.strip():
+                args = [a.strip() for a in argstr.split(',')]
+
+            macro = self.macros[name]
+
+            if len(args) != len(macro.args):
+                raise SyntaxError(
+                    f"Macro '{name}' expects {len(macro.args)} arguments, got {len(args)}"
+                )
+                # making ts like a professional language lawl
+
+            expanded.extend(macro.get_asm(args).splitlines())
+
+        self.code = expanded
+        return expanded
     def translate(self,line:str)->list[int]:
         tokens=line.split(' ')
         # print(tokens)
@@ -138,10 +207,12 @@ class Assembler:
         # no argumented ones
         if opcode in ['halt','nop']:
              return [OPCODES[opcode],0,0]+[0]*16
+        raise ValueError(f"unknown opcode \'{opcode}\'")
     
     def assemble(self,debug_mode=False)->list[list[int]]:
         '''no need for anything this just returns the perfectly done machine code'''
         self.preprocess()
+        self.expand()
         out=[]
         for line in self.code:
             o=self.translate(line)
