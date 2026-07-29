@@ -50,13 +50,27 @@ def to_stream(num:int,size=16):
         binary[size-len(b)+i]=int(b[i])
     return binary
 class Macro:
-    def __init__(self, args: list[str], code: str):
+    def __init__(self,name:str,args: list[str], code: str):
+        self.name=name
         self.args = args
         self.code = code
-
+        self.calls=0
+    def called(self):
+        self.calls+=1
+        c=[]
+        for line in self.code.split('\n'):
+            l=[]
+            for token in line.split(' '):
+                if token.startswith('.'):
+                     l.append(f'.{self.name}_{token[1:]}_{self.calls}')
+                else:
+                     l.append(token)
+            c.append(' '.join(l))
+        return '\n'.join(c)    
     def get_asm(self, values: list[str]) -> str:
+        code=self.called()
         mapping = dict(zip(self.args, values))
-        return self.code.format(**mapping)
+        return code.format(**mapping)
 class Assembler:
     def __init__(self,code:str):
         self.code:list[str]=[]
@@ -96,7 +110,7 @@ class Assembler:
                     if line:
                         body.append(line)
                     i += 1
-                self.macros[name] = Macro(args, "\n".join(body))
+                self.macros[name] = Macro(name,args, "\n".join(body))
                 i += 1
                 continue
 
