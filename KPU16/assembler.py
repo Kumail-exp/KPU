@@ -78,7 +78,7 @@ class Assembler:
             self.code.append(i)
         self.labels:dict[str,int]={}
         self.macros={}
-    def preprocess(self) -> list[str]:
+    def preprocess(self,labelise=True) -> list[str]:
         nc = []
         i = 0
         # i have to change the loop format from for loop to while becoz udk it seemed simpler
@@ -89,11 +89,11 @@ class Assembler:
             if not instruction:
                 i += 1
                 continue
-
-            if instruction.startswith('.'):
-                self.labels[instruction[1:]] = len(nc)
-                i += 1
-                continue
+            if labelise:
+                if instruction.startswith('.'):
+                    self.labels[instruction[1:]] = len(nc)
+                    i += 1
+                    continue
 
             if instruction.startswith('$'):
                 header = instruction[1:]
@@ -114,7 +114,7 @@ class Assembler:
                 i += 1
                 continue
 
-            nc.append(instruction.lower())
+            nc.append(instruction)
             i += 1
 
         self.code = nc
@@ -155,77 +155,80 @@ class Assembler:
         self.code = expanded
         return expanded
     def translate(self,line:str)->list[int]:
-        tokens=line.split(' ')
-        # print(tokens)
-        opcode=tokens[0]
-        # 3 input ones
-        if(opcode in [  'add',
-                        'sub',
-                        'mult',
-                        'div',
-                        'mod',
-                        'and',
-                        'or',
-                        'xor',
-                        'min',
-                        'max',
-                        ]):
-            return [OPCODES[opcode],reg_adress(tokens[1]),reg_adress(tokens[2])]+to_stream(reg_adress(tokens[3]),5)+[0]*11
-        #two input oens
-        if (opcode in [
-                        'load',
-                        'store',
-                        'cmp',
-                        'mov',
-                        'not',
-                        'shl',
-                        'shr',
-                        'sar',
-                        'rol',
-                        'ror'
+        try:
+            tokens=line.split(' ')
+            # print(tokens)
+            opcode=tokens[0]
+            # 3 input ones
+            if(opcode in [  'add',
+                            'sub',
+                            'mult',
+                            'div',
+                            'mod',
+                            'and',
+                            'or',
+                            'xor',
+                            'min',
+                            'max',
                             ]):
-            return [OPCODES[opcode],reg_adress(tokens[1]),reg_adress(tokens[2])]+[0]*16
-        # specific ones:
-        if(opcode=='ldi'):
-            if tokens[2][0]=='\'' and tokens[2][-1]=='\'':
-                 val=ascii_val(tokens[2][1:-1])
-            else:
-                 val=int(tokens[2])
-            return [OPCODES[opcode],reg_adress(tokens[1]),0]+to_stream(val)
-        if(opcode=='jump'):
-                    try:
-                        if tokens[1].startswith('.'):
-                            value=self.labels[tokens[1][1:]] 
-                        else:
-                            value=int(tokens[1])
-                    except Exception as e:
-                        print(e)
-                        raise ValueError(f'invalid argument to jump->\'{tokens[1]}\'')
-                    return [OPCODES[opcode]]+[0]*2+to_stream(value)
-        if(opcode=='jc'):
-                            flag_code={'z':1,'n':2,'c':3,'v':4}
-                            
-                            try:
-                                if tokens[2][0]=='.':
-                                    value=self.labels[tokens[2][1:]] 
-                                else:
-                                    value=int(tokens[2])
-                                fc=flag_code[tokens[1]]
-                            except Exception as e:
-                                print(e)
-                                raise ValueError(f'invalid argument to jump->\'{tokens[2]}\'')
-                            return [OPCODES[opcode],fc,0]+to_stream(value)      
-        # one argument ones:
-        if opcode in ['display','read','gettime','print','println','mousex','mousey']:
-             return [OPCODES[opcode],reg_adress(tokens[1]),0]+[0]*16
-        # no argumented ones
-        if opcode in ['halt','nop']:
-             return [OPCODES[opcode],0,0]+[0]*16
-        raise ValueError(f"unknown opcode \'{opcode}\'")
-    
+                return [OPCODES[opcode],reg_adress(tokens[1]),reg_adress(tokens[2])]+to_stream(reg_adress(tokens[3]),5)+[0]*11
+            #two input oens
+            if (opcode in [
+                            'load',
+                            'store',
+                            'cmp',
+                            'mov',
+                            'not',
+                            'shl',
+                            'shr',
+                            'sar',
+                            'rol',
+                            'ror'
+                                ]):
+                return [OPCODES[opcode],reg_adress(tokens[1]),reg_adress(tokens[2])]+[0]*16
+            # specific ones:
+            if(opcode=='ldi'):
+                if tokens[2][0]=='\'' and tokens[2][-1]=='\'':
+                    val=ascii_val(tokens[2][1:-1])
+                else:
+                    val=int(tokens[2])
+                return [OPCODES[opcode],reg_adress(tokens[1]),0]+to_stream(val)
+            if(opcode=='jump'):
+                        try:
+                            if tokens[1].startswith('.'):
+                                value=self.labels[tokens[1][1:]] 
+                            else:
+                                value=int(tokens[1])
+                        except Exception as e:
+                            print(e)
+                            raise ValueError(f'invalid argument to jump->\'{tokens[1]}\'')
+                        return [OPCODES[opcode]]+[0]*2+to_stream(value)
+            if(opcode=='jc'):
+                                flag_code={'z':1,'n':2,'c':3,'v':4}
+                                
+                                try:
+                                    if tokens[2][0]=='.':
+                                        value=self.labels[tokens[2][1:]] 
+                                    else:
+                                        value=int(tokens[2])
+                                    fc=flag_code[tokens[1]]
+                                except Exception as e:
+                                    print(e)
+                                    raise ValueError(f'invalid argument to jump->\'{tokens[2]}\'')
+                                return [OPCODES[opcode],fc,0]+to_stream(value)      
+            # one argument ones:
+            if opcode in ['display','read','gettime','print','println','mousex','mousey']:
+                return [OPCODES[opcode],reg_adress(tokens[1]),0]+[0]*16
+            # no argumented ones
+            if opcode in ['halt','nop']:
+                return [OPCODES[opcode],0,0]+[0]*16
+            raise ValueError(f"unknown opcode \'{opcode}\'")
+        except Exception as e:
+            print(f'error in line->{line}')
+            print(e)
     def assemble(self,debug_mode=False)->list[list[int]]:
         '''no need for anything this just returns the perfectly done machine code'''
-        self.preprocess()
+        self.preprocess(False)
         self.expand()
         # print("\n".join(self.code))
         # since we need to process the labels inside the macros
