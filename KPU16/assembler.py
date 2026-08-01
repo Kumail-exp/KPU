@@ -79,7 +79,7 @@ class Assembler:
         self.labels:dict[str,int]={}
         self.macros={}
         self.globals={}
-    def preprocess(self,labelise=True) -> list[str]:
+    def preprocess(self,labelise=True,expand_prints=False) -> list[str]:
         nc = []
         i = 0
         # i have to change the loop format from for loop to while becoz udk it seemed simpler
@@ -120,6 +120,35 @@ class Assembler:
                 i += 1
                 continue
 
+            # shortcuts
+            if expand_prints:
+                if instruction.startswith('println'):
+                    word = instruction[len('println'):].strip()
+
+                    if word.startswith("'") and word.endswith("'"):
+                        word = word[1:-1]
+
+                    for l in word:
+                        nc.append(f"ldi r0 {ascii_val(l)}")
+                        nc.append("print r0")
+
+                    nc.append("ldi r0 10")
+                    nc.append("print r0")
+                    i += 1
+                    continue
+
+                if instruction.startswith('print'):
+                    word = instruction[len('print'):].strip()
+
+                    if word.startswith("'") and word.endswith("'"):
+                        word = word[1:-1]
+
+                    for l in word:
+                        nc.append(f"ldi r0 {ascii_val(l)}")
+                        nc.append("print r0")
+
+                    i += 1
+                    continue
             nc.append(instruction)
             i += 1
 
@@ -160,9 +189,9 @@ class Assembler:
 
         self.code = expanded
         return expanded
-    def translate(self,line:str)->list[int]:
+    def translate(self,line:str)->list[list[int]]:
         try:
-            tokens=line.split(' ')
+            tokens=line.split()
             # print(tokens)
             opcode=tokens[0]
             # 3 input ones
@@ -177,7 +206,7 @@ class Assembler:
                             'min',
                             'max',
                             ]):
-                return [OPCODES[opcode],reg_adress(tokens[1]),reg_adress(tokens[2])]+to_stream(reg_adress(tokens[3]),5)+[0]*11
+                return [[OPCODES[opcode],reg_adress(tokens[1]),reg_adress(tokens[2])]+to_stream(reg_adress(tokens[3]),5)+[0]*11]
             #two input oens
             if (opcode in [
                             'load',
@@ -191,16 +220,16 @@ class Assembler:
                             'rol',
                             'ror'
                                 ]):
-                return [OPCODES[opcode],reg_adress(tokens[1]),reg_adress(tokens[2])]+[0]*16
+                return [[OPCODES[opcode],reg_adress(tokens[1]),reg_adress(tokens[2])]+[0]*16]
             # specific ones:
             if(opcode=='ldi'):
-                if(self.globals.get(tokens[2],0)!=0):
-                    tokens[2]=self.globals[tokens[2]]
+                if tokens[2] in self.globals:
+                    tokens[2] = self.globals[tokens[2]]
                 if tokens[2][0]=='\'' and tokens[2][-1]=='\'':
                     val=ascii_val(tokens[2][1:-1])
                 else:
                     val=int(tokens[2])
-                return [OPCODES[opcode],reg_adress(tokens[1]),0]+to_stream(val)
+                return [[OPCODES[opcode],reg_adress(tokens[1]),0]+to_stream(val)]
             if(opcode=='jump'):
                         try:
                             if tokens[1].startswith('.'):
@@ -210,7 +239,7 @@ class Assembler:
                         except Exception as e:
                             print(e)
                             raise ValueError(f'invalid argument to jump->\'{tokens[1]}\'')
-                        return [OPCODES[opcode]]+[0]*2+to_stream(value)
+                        return [[OPCODES[opcode]]+[0]*2+to_stream(value)]
             if(opcode=='jc'):
                                 flag_code={'z':1,'n':2,'c':3,'v':4}
                                 
@@ -223,20 +252,21 @@ class Assembler:
                                 except Exception as e:
                                     print(e)
                                     raise ValueError(f'invalid argument to jump->\'{tokens[2]}\'')
-                                return [OPCODES[opcode],fc,0]+to_stream(value)      
+                                return [[OPCODES[opcode],fc,0]+to_stream(value)]      
             # one argument ones:
             if opcode in ['display','read','gettime','print','println','mousex','mousey']:
-                return [OPCODES[opcode],reg_adress(tokens[1]),0]+[0]*16
+                return [[OPCODES[opcode],reg_adress(tokens[1]),0]+[0]*16]
             # no argumented ones
             if opcode in ['halt','nop']:
-                return [OPCODES[opcode],0,0]+[0]*16
+                return [[OPCODES[opcode],0,0]+[0]*16]
             raise ValueError(f"unknown opcode \'{opcode}\'")
         except Exception as e:
             print(f'error in line->{line}')
             print(e)
+            raise
     def assemble(self,debug_mode=False)->list[list[int]]:
         '''no need for anything this just returns the perfectly done machine code'''
-        self.preprocess(False)
+        self.preprocess(False,True)
         self.expand()
         # print("\n".join(self.code))
         # since we need to process the labels inside the macros
@@ -249,7 +279,8 @@ class Assembler:
             if o:
                 if debug_mode:
                      print(f'{line}-->{o}')
-                out.append(o)
+                for ins in o:
+                    out.append(ins)
         return out
 
 if __name__=='__main__':
@@ -265,7 +296,7 @@ if __name__=='__main__':
     with open(input_file) as f:
         source = f.read()
     obj=Assembler(source)
-    mc=obj.assemble(0)
+    mc=obj.assemble(1)
 
     machine_code =str(mc)
 
