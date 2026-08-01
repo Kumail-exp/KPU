@@ -41,8 +41,17 @@ def ascii_val(char: str):
     else:
         raise ValueError('not a correct ascii')
 
-def reg_adress(addr:str):
-    return int(addr[1:])%32
+def reg_adress(addr: str):
+    if not addr.startswith('r'):
+        raise ValueError(f"invalid register '{addr}'")
+    try:
+        reg = int(addr[1:])
+    except ValueError:
+        raise ValueError(f"invalid register '{addr}'")
+    if not 0 <= reg <= 31:
+        raise ValueError(f"register out of range '{addr}' (expected r1-r31)")
+
+    return reg
 def to_stream(num:int,size=16):
     b=bin(num)[2:]
     binary=[0]*size

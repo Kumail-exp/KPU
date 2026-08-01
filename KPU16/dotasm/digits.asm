@@ -1,10 +1,11 @@
+println 'Enter a number to find the digits of:'
 read r1
 ldi r2 10
 ldi r4 0
 ldi r5 1
 
 .loop
-    cmp r1 r0
+    cmp r1 r10
     jc z .prep
     mod r3 r1 r2
     store r4 r3

@@ -1,3 +1,4 @@
+println 'Enter a number to find the factors of:'
 read r1
 ldi r2 2
 ldi r3 1

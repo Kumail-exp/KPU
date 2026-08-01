@@ -1,3 +1,4 @@
+println 'Enter a number to find the factorial of:'
 read r1
 ldi r2 1
 ldi r3 1
@@ -11,5 +12,6 @@ ldi r4 1
     jump .loop
 
 .end
-display r3
-halt
+    print 'factorial: '
+    display r3
+    halt

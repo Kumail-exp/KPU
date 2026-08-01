@@ -1,4 +1,6 @@
+println 'Enter base:'
 read r1 #base
+println 'Enter power:'
 read r2 #number
 ldi r3 0 # log
 ldi r4 1
@@ -9,5 +11,6 @@ ldi r4 1
     jc z .end
     jump .loop
 .end
+    print 'log:'
     display r3
     halt

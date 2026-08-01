@@ -1,3 +1,4 @@
+print 'enter a number to square root:'
 read r1
 ldi r2 0
 ldi r3 1

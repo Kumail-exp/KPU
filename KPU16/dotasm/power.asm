@@ -1,4 +1,6 @@
+println 'enter base:'
 read r1
+println 'enter power:'
 read r2
 ldi r3 1
 ldi r4 1
@@ -8,5 +10,6 @@ ldi r4 1
     jc z .end
     jump .loop
 .end
+    print 'exponent'
     display r3
     halt
