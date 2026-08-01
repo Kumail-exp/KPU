@@ -78,6 +78,7 @@ class Assembler:
             self.code.append(i)
         self.labels:dict[str,int]={}
         self.macros={}
+        self.globals={}
     def preprocess(self,labelise=True) -> list[str]:
         nc = []
         i = 0
@@ -94,7 +95,12 @@ class Assembler:
                     self.labels[instruction[1:]] = len(nc)
                     i += 1
                     continue
-
+            if instruction.startswith('&'):
+                var=instruction[1:]
+                tk=var.split('=')
+                self.globals[tk[0].strip()]=tk[1].strip()
+                i+=1
+                continue
             if instruction.startswith('$'):
                 header = instruction[1:]
 
@@ -188,6 +194,8 @@ class Assembler:
                 return [OPCODES[opcode],reg_adress(tokens[1]),reg_adress(tokens[2])]+[0]*16
             # specific ones:
             if(opcode=='ldi'):
+                if(self.globals.get(tokens[2],0)!=0):
+                    tokens[2]=self.globals[tokens[2]]
                 if tokens[2][0]=='\'' and tokens[2][-1]=='\'':
                     val=ascii_val(tokens[2][1:-1])
                 else:
@@ -233,6 +241,7 @@ class Assembler:
         # print("\n".join(self.code))
         # since we need to process the labels inside the macros
         self.preprocess()
+        # print(self.globals)
         # print(self.labels)
         out=[]
         for line in self.code:
