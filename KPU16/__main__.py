@@ -121,18 +121,29 @@ class CPU:
         self.instructions=[]
             
 
+if __name__ == '__main__':
 
-if __name__=='__main__':
+    if len(sys.argv) != 2:
+        print("u cant even use a basic program")
+        sys.exit(1)
 
-        if len(sys.argv) != 2:
-            print("u cant even use a basic program")
-            sys.exit(1)
+    input_file = Path("dotkpu") / sys.argv[1]
 
-        input_file = Path("dotkpu") / sys.argv[1]
-        with open(input_file) as f:
-            source = f.read()
-        ins = ast.literal_eval(source)
-        cpu=CPU()
-        cpu.give_ins(ins)
-        cpu.run()
-    
+    ins = []
+
+    print("Loading program...")
+    with open(input_file) as f:
+        for i, line in enumerate(f):
+            line = line.strip()
+            if not line:
+                continue
+
+            ins.append(ast.literal_eval(line))
+
+            if (i + 1) % 8192 == 0:
+                print(f"Loaded {i + 1} instructions...")
+
+    print(f"Program loaded. ({len(ins)} instructions)")
+    cpu = CPU()
+    cpu.give_ins(ins)
+    cpu.run()

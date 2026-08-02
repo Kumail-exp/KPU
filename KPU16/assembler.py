@@ -310,12 +310,10 @@ if __name__=='__main__':
     with open(input_file) as f:
         source = f.read()
     obj=Assembler(source)
-    mc=obj.assemble(1)
+    mc=obj.assemble(0)
 
 
     with open(out, "w") as f:
-        f.write('[\n')
         for line in mc:
-            f.write(f'{line},\n')
-        f.write(']')
+            f.write(f'{line}\n')
     print(f'program assebled succesfully into {out}')
