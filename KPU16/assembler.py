@@ -30,7 +30,10 @@ OPCODES = {
     'print':28,
     'println':29,
     'mousex':30,
-    'mousey':31
+    'mousey':31,
+    'setpixel':32,
+    'getpixel':33,
+    'dispflip':34
     }
 def ascii_val(char: str):
     if len(char) != 1:
@@ -214,6 +217,8 @@ class Assembler:
                             'xor',
                             'min',
                             'max',
+                            'setpixel',
+                            'getpixel'
                             ]):
                 return [[OPCODES[opcode],reg_adress(tokens[1]),reg_adress(tokens[2])]+to_stream(reg_adress(tokens[3]),5)+[0]*11]
             #two input oens
@@ -266,7 +271,7 @@ class Assembler:
             if opcode in ['display','read','gettime','print','println','mousex','mousey']:
                 return [[OPCODES[opcode],reg_adress(tokens[1]),0]+[0]*16]
             # no argumented ones
-            if opcode in ['halt','nop']:
+            if opcode in ['halt','nop','dispflip']:
                 return [[OPCODES[opcode],0,0]+[0]*16]
             raise ValueError(f"unknown opcode \'{opcode}\'")
         except Exception as e:
@@ -305,7 +310,7 @@ if __name__=='__main__':
     with open(input_file) as f:
         source = f.read()
     obj=Assembler(source)
-    mc=obj.assemble(0)
+    mc=obj.assemble(1)
 
 
     with open(out, "w") as f:

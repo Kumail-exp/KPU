@@ -1,4 +1,5 @@
 from ALU import *
+from display import Display
 import ast
 import sys
 from pathlib import Path
@@ -38,6 +39,7 @@ class CPU:
         self.memory={}#memory is too large to pre allocate so we allocate it at runtime lwk
         self.alu=ALU()
         self.running=True
+        self.display=Display()
     def execute(self,instruction:list[int]):
         # print(instruction)
         # for alu based operations:
@@ -89,6 +91,22 @@ class CPU:
              print(chr(self.registers[addr1]),end=('' if opcode==28 else '\n'))
         elif opcode==30 or opcode==31:
              self.registers[addr1]=mouse.position[0 if opcode==30 else 1]
+        elif opcode==32:
+            #  set pixel
+            self.display.set_pixel(
+                self.registers[addr1],
+                self.registers[addr2],
+                self.registers[addr3]
+            )
+        elif opcode==33:
+            #  get pixel
+            self.registers[addr1] = self.display.get_pixel(
+                self.registers[addr2],
+                self.registers[addr3]
+            )
+        elif opcode==34:
+            #  flip display
+            self.display.flip()
         else:
                 raise ValueError(f'this opcode {opcode} is not yet defined')
         return self.pc+1
@@ -99,7 +117,8 @@ class CPU:
         while self.pc<len(self.instructions) and self.pc>=0 and self.running:
             # print(self.pc)
             self.pc=self.execute(self.instructions[self.pc])
-        self.instructions=[[]]
+            self.display.update()
+        self.instructions=[]
             
 
 
