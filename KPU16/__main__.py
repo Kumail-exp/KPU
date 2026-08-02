@@ -4,8 +4,7 @@ import ast
 import sys
 from pathlib import Path
 import time
-from pynput.mouse import Controller
-mouse = Controller()
+from pynput.mouse import Button,Listener,Controller
 
 
 # some filler functiuons
@@ -30,6 +29,23 @@ def to_num(stream: list[int], size=None, two_complement=False)->int:
 
     return value
 
+class Mouse:
+    def __init__(self):
+        self.controller = Controller()
+
+        self.left = False
+        self.right = False
+        self.middle = False
+
+        self.listener = Listener(on_click=self.on_click)
+        self.listener.start()
+    def on_click(self, x, y, button, pressed):
+        if button == Button.left:
+            self.left = pressed
+        elif button == Button.right:
+            self.right = pressed
+        elif button == Button.middle:
+            self.middle = pressed
 
 class CPU:
     def __init__(self):
@@ -40,6 +56,7 @@ class CPU:
         self.alu=ALU()
         self.running=True
         self.display=Display()
+        self.mouse=Mouse()
     def execute(self,instruction:list[int]):
         # print(instruction)
         # for alu based operations:
@@ -90,7 +107,7 @@ class CPU:
         elif opcode==28 or opcode==29:
              print(chr(self.registers[addr1]),end=('' if opcode==28 else '\n'))
         elif opcode==30 or opcode==31:
-             self.registers[addr1]=mouse.position[0 if opcode==30 else 1]
+             self.registers[addr1]=self.mouse.controller.position[0 if opcode==30 else 1]
         elif opcode==32:
             #  set pixel
             self.display.set_pixel(
@@ -107,6 +124,17 @@ class CPU:
         elif opcode==34:
             #  flip display
             self.display.flip()
+        elif opcode == 35:
+            button = self.registers[addr2]
+
+            if button == 0:
+                self.registers[addr1] = int(self.mouse.left)
+            elif button == 1:
+                self.registers[addr1] = int(self.mouse.right)
+            elif button == 2:
+                self.registers[addr1] = int(self.mouse.middle)
+            else:
+                self.registers[addr1] = 0
         else:
                 raise ValueError(f'this opcode {opcode} is not yet defined')
         return self.pc+1

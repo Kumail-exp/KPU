@@ -1,7 +1,8 @@
 #i am bad with displays and i want a little performance so vibecoded this file
 
 import pygame
-
+import subprocess
+import time
 
 class Display:
     def __init__(self, width=32, height=32, scale=12):
@@ -18,6 +19,16 @@ class Display:
         )
 
         self.surface = pygame.Surface((width, height))
+        pygame.display.set_caption("KPU Display")
+        print('intitializing display')
+        time.sleep(1)
+        subprocess.run([
+            "wmctrl",
+            "-r",
+            "KPU Display",
+            "-b",
+            "add,above"
+        ])
 
     def set_pixel(self, x: int, y: int, color: int):
         if 0 <= x < self.width and 0 <= y < self.height:

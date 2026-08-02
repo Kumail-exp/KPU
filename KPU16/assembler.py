@@ -33,7 +33,8 @@ OPCODES = {
     'mousey':31,
     'setpixel':32,
     'getpixel':33,
-    'dispflip':34
+    'dispflip':34,
+    'mbutton'   :35
     }
 def ascii_val(char: str):
     if len(char) != 1:
@@ -232,7 +233,8 @@ class Assembler:
                             'shr',
                             'sar',
                             'rol',
-                            'ror'
+                            'ror',
+                            'mbutton'
                                 ]):
                 return [[OPCODES[opcode],reg_adress(tokens[1]),reg_adress(tokens[2])]+[0]*16]
             # specific ones:
