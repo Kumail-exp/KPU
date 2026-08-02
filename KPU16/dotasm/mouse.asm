@@ -13,8 +13,7 @@ ldi r2 0
     mov r2 r4
     display r3
     display r4
-    ldi r5 10
-    print r5
+    println ' '
     jump .loop
 
 .check_y
