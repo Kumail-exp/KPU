@@ -5,9 +5,49 @@ import sys
 from pathlib import Path
 import time
 from pynput.mouse import Button,Listener,Controller
+from pynput.keyboard import KeyCode
+from pynput.keyboard import Listener as KeyboardListener
+from pynput import keyboard
 
 
-# some filler functiuons
+SPECIAL_KEYS = {
+    1000: keyboard.Key.up,
+    1001: keyboard.Key.down,
+    1002: keyboard.Key.left,
+    1003: keyboard.Key.right,
+    1004: keyboard.Key.home,
+    1005: keyboard.Key.end,
+    1006: keyboard.Key.page_up,
+    1007: keyboard.Key.page_down,
+    1008: keyboard.Key.insert,
+    1009: keyboard.Key.shift,
+    1010: keyboard.Key.ctrl,
+    1011: keyboard.Key.alt,
+    1012: keyboard.Key.caps_lock,
+    1020: keyboard.Key.f1,
+    1021: keyboard.Key.f2,
+    1022: keyboard.Key.f3,
+    1023: keyboard.Key.f4,
+    1024: keyboard.Key.f5,
+    1025: keyboard.Key.f6,
+    1026: keyboard.Key.f7,
+    1027: keyboard.Key.f8,
+    1028: keyboard.Key.f9,
+    1029: keyboard.Key.f10,
+    1030: keyboard.Key.f11,
+    1031: keyboard.Key.f12,
+}
+keys=set()
+def on_press(key):
+    keys.add(key)
+
+def on_release(key):
+    keys.discard(key)
+keyboard_listener = KeyboardListener(
+    on_press=on_press,
+    on_release=on_release
+)
+keyboard_listener.start()
 def to_stream(num:int,size=8):
     b=bin(num)[2:]
     binary=[0]*size
@@ -135,6 +175,14 @@ class CPU:
                 self.registers[addr1] = int(self.mouse.middle)
             else:
                 self.registers[addr1] = 0
+        elif opcode == 36:
+            key_code = to_num(other, size=16)
+            
+
+            if key_code in SPECIAL_KEYS:
+                self.registers[addr1] = int(SPECIAL_KEYS[key_code] in keys)
+            else:
+                self.registers[addr1] = int(KeyCode.from_char(chr(key_code)) in keys)
         else:
                 raise ValueError(f'this opcode {opcode} is not yet defined')
         return self.pc+1

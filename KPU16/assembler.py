@@ -34,8 +34,51 @@ OPCODES = {
     'setpixel':32,
     'getpixel':33,
     'dispflip':34,
-    'mbutton'   :35
+    'mbutton'   :35,
+    'key':36
     }
+KEYS = {
+    # Control
+    "KEY_BACKSPACE": 8,
+    "KEY_TAB": 9,
+    "KEY_ENTER": 13,
+    "KEY_ESCAPE": 27,
+    "KEY_SPACE": 32,
+    "KEY_DELETE": 127,
+
+    # Arrows
+    "KEY_UP": 1000,
+    "KEY_DOWN": 1001,
+    "KEY_LEFT": 1002,
+    "KEY_RIGHT": 1003,
+
+    # Navigation
+    "KEY_HOME": 1004,
+    "KEY_END": 1005,
+    "KEY_PAGEUP": 1006,
+    "KEY_PAGEDOWN": 1007,
+    "KEY_INSERT": 1008,
+
+    # Modifiers
+    "KEY_SHIFT": 1009,
+    "KEY_CTRL": 1010,
+    "KEY_ALT": 1011,
+    "KEY_CAPSLOCK": 1012,
+
+    # Function keys
+    "KEY_F1": 1020,
+    "KEY_F2": 1021,
+    "KEY_F3": 1022,
+    "KEY_F4": 1023,
+    "KEY_F5": 1024,
+    "KEY_F6": 1025,
+    "KEY_F7": 1026,
+    "KEY_F8": 1027,
+    "KEY_F9": 1028,
+    "KEY_F10": 1029,
+    "KEY_F11": 1030,
+    "KEY_F12": 1031,
+}   
 def ascii_val(char: str):
     if len(char) != 1:
         raise ValueError(f'not a single character->\'{char}\'')
@@ -238,13 +281,13 @@ class Assembler:
                                 ]):
                 return [[OPCODES[opcode],reg_adress(tokens[1]),reg_adress(tokens[2])]+[0]*16]
             # specific ones:
-            if(opcode=='ldi'):
-                if tokens[2] in self.globals:
-                    tokens[2] = self.globals[tokens[2]]
-                if tokens[2][0]=='\'' and tokens[2][-1]=='\'':
-                    val=ascii_val(tokens[2][1:-1])
+            if(opcode=='ldi' or opcode=='key'):
+                if tokens[2] in KEYS:
+                    val = KEYS[tokens[2]]
+                elif tokens[2][0] == "'" and tokens[2][-1] == "'":
+                    val = ascii_val(tokens[2][1:-1])
                 else:
-                    val=int(tokens[2])
+                    val = int(tokens[2])
                 return [[OPCODES[opcode],reg_adress(tokens[1]),0]+to_stream(val)]
             if(opcode=='jump'):
                         try:
@@ -312,7 +355,7 @@ if __name__=='__main__':
     with open(input_file) as f:
         source = f.read()
     obj=Assembler(source)
-    mc=obj.assemble(0)
+    mc=obj.assemble(1)
 
 
     with open(out, "w") as f:

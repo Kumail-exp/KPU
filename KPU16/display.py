@@ -9,7 +9,7 @@ class Display:
         self.width = width
         self.height = height
         self.scale = scale
-
+        
         self.vram = bytearray(width * height)
 
         pygame.init()
@@ -20,16 +20,6 @@ class Display:
 
         self.surface = pygame.Surface((width, height))
         pygame.display.set_caption("KPU Display")
-        print('intitializing display')
-        time.sleep(1)
-        subprocess.run([
-            "wmctrl",
-            "-r",
-            "KPU Display",
-            "-b",
-            "add,above"
-        ])
-
     def set_pixel(self, x: int, y: int, color: int):
         if 0 <= x < self.width and 0 <= y < self.height:
             self.vram[y * self.width + x] = color & 0xFF
