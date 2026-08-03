@@ -283,7 +283,7 @@ class Assembler:
             # specific ones:
             if(opcode=='ldi' or opcode=='key'):
                 if tokens[2] in KEYS:
-                    val = KEYS[tokens[2]]
+                    val = KEYS[tokens[2].upper()]
                 elif tokens[2][0] == "'" and tokens[2][-1] == "'":
                     val = ascii_val(tokens[2][1:-1])
                 else:
