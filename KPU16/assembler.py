@@ -99,12 +99,10 @@ def reg_adress(addr: str):
         raise ValueError(f"register out of range '{addr}' (expected r1-r31)")
 
     return reg
-def to_stream(num:int,size=16):
-    b=bin(num)[2:]
-    binary=[0]*size
-    for i in range(len(b)):
-        binary[size-len(b)+i]=int(b[i])
-    return binary
+def to_stream(num: int, size=16):
+    #stole this from stack overflow
+    num &= (1 << size) - 1
+    return [(num >> (size - 1 - i)) & 1 for i in range(size)]
 class Macro:
     def __init__(self,name:str,args: list[str], code: str):
         self.name=name
