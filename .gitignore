@@ -2,3 +2,5 @@
 __pycache__/
 *.ods#
 *.jpg
+*.kpu
+badapple.asm

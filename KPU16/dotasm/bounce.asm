@@ -22,8 +22,6 @@ ldi r10 100       # delay
     jump .loop
 
 .work
-    mov r12 r11
-
     setpixel r3 r4 r9
 
     add r3 r3 r1
