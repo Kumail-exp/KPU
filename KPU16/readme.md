@@ -821,7 +821,23 @@ The assembler reports errors for
 Assembly stops immediately when an error is encountered.
 
 
+# Code running process
+change directory to this folder
+```bash
+cd KPU16
+```
 
+write the program in the dotasm folder as a .asm file
+and now assemble the program into the corres
+```bash
+python assembler.py filename.asm
+```
+file is now saved in a corresponding same named .kpu file inside the dotkpu folder which contains the executable machine code for the KPU
+```bash
+python . filename filename.kpu
+```
+
+you can also assemble and run the programs previously made by contributer(only me ofc)
 
 # Words of maker
-- this is genuinly one of my most beloved projects of all time, because this time i am not programming a design made by someone one years ago, I am making the design itself. after recently running famous mysic video bad apple on it i am more happier with this projecy. Its not completed yet and is totally open to contributions and recommendations and even sample programms. Guide is above and refer to the programs made previously. - Kumail-exp
+- this is genuinly one of my most beloved projects of all time, because this time i am not programming a design made by someone one years ago, I am making the design itself. after recently running famous music video bad apple on it i am more happier with this projecy. Its not completed yet and is totally open to contributions and recommendations and even sample programms. Guide is above and refer to the programs made previously. In case of any bugs please leave a issue. - Kumail-exp
