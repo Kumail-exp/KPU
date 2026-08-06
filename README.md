@@ -10,7 +10,7 @@ cd KPU
 
 intall dependencies
 ```bash
-pip install requirments.txt
+pip install -r requirments.txt
 ```
 now for furhter processes check out readme of each sub project
 # projects made currently:
