@@ -280,7 +280,12 @@ class Assembler:
                 return [[OPCODES[opcode],reg_adress(tokens[1]),reg_adress(tokens[2])]+[0]*16]
             # specific ones:
             if(opcode=='ldi' or opcode=='key'):
-                if tokens[2] in KEYS:
+                if(tokens[2][0]=='&'):
+                    if tokens[2][1:] in self.globals:
+                        val=int(self.globals[tokens[2][1:]])
+                    else:
+                        raise ValueError(f'unknown global variable \'{tokens[2][1:]}\'')
+                elif tokens[2] in KEYS:
                     val = KEYS[tokens[2].upper()]
                 elif tokens[2][0] == "'" and tokens[2][-1] == "'":
                     val = ascii_val(tokens[2][1:-1])
