@@ -1,0 +1,87 @@
+{
+    "scopeName": "source.kpu",
+
+    "patterns": [
+        {
+            "name": "comment.line.number-sign.kpu",
+            "match": "#.*$"
+        },
+
+        {
+            "name": "keyword.control.kpu",
+            "match": "\\b(add|sub|mult|div|mod|min|max|and|or|xor|not|shl|shr|sar|rol|ror|mov|ldi|load|store|cmp|jump|jc|nop|halt|read|display|print|println|gettime|time|mousex|mousey|mbutton|key|setpixel|getpixel|dispflip)\\b"
+        },
+
+        {
+            "name": "variable.language.register.kpu",
+            "match": "\\b[rR](?:[0-9]|[12][0-9]|3[01])\\b"
+        },
+
+        {
+            "name": "constant.numeric.kpu",
+            "match": "(?<![\\w.])-?(?:0[xX][0-9a-fA-F]+|0[bB][01]+|\\d+)"
+        },
+
+        {
+            "name": "constant.character.kpu",
+            "match": "'(?:\\\\.|[^'\\\\])'"
+        },
+
+        {
+            "name": "string.quoted.single.kpu",
+            "begin": "'",
+            "end": "'",
+            "patterns": [
+                {
+                    "name": "constant.character.escape.kpu",
+                    "match": "\\\\."
+                }
+            ]
+        },
+
+        {
+            "name": "entity.name.label.kpu",
+            "match": "^\\s*\\.[A-Za-z_][A-Za-z0-9_]*"
+        },
+
+        {
+            "name": "entity.name.label.reference.kpu",
+            "match": "\\.[A-Za-z_][A-Za-z0-9_]*"
+        },
+
+        {
+            "name": "constant.other.kpu",
+            "match": "&[A-Za-z_][A-Za-z0-9_]*"
+        },
+
+        {
+            "name": "keyword.other.macro.definition.kpu",
+            "match": "\\$[A-Za-z_][A-Za-z0-9_]*\\s*(?=\\()"
+        },
+
+        {
+            "name": "entity.name.function.macro.kpu",
+            "match": "(?<!\\$)\\b[A-Za-z_][A-Za-z0-9_]*(?=\\()"
+        },
+
+        {
+            "name": "variable.parameter.macro.kpu",
+            "match": "\\{[A-Za-z_][A-Za-z0-9_]*\\}"
+        },
+
+        {
+            "name": "constant.language.key.kpu",
+            "match": "\\bKEY_(?:BACKSPACE|TAB|ENTER|ESCAPE|SPACE|DELETE|UP|DOWN|LEFT|RIGHT|HOME|END|PAGEUP|PAGEDOWN|INSERT|SHIFT|CTRL|ALT|CAPSLOCK|F(?:[1-9]|1[0-2]))\\b"
+        },
+
+        {
+            "name": "keyword.operator.assignment.kpu",
+            "match": "="
+        },
+
+        {
+            "name": "punctuation.definition.macro.kpu",
+            "match": "[\\$\\{\\}\\(\\)]"
+        }
+    ]
+}

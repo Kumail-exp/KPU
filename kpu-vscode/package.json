@@ -1,0 +1,34 @@
+{
+    "name": "kpu-assembly",
+    "displayName": "KPU Assembly",
+    "description": "Syntax highlighting for KPU-16 assembly",
+    "version": "0.0.1",
+    "engines": {
+        "vscode": "^1.80.0"
+    },
+    "categories": [
+        "Programming Languages"
+    ],
+    "contributes": {
+        "languages": [
+            {
+                "id": "kpu",
+                "aliases": [
+                    "KPU Assembly",
+                    "kpu"
+                ],
+                "extensions": [
+                    ".asm"
+                ],
+                "configuration": "./language-configuration.json"
+            }
+        ],
+        "grammars": [
+            {
+                "language": "kpu",
+                "scopeName": "source.kpu",
+                "path": "./syntaxes/kpu.tmLanguage.json"
+            }
+        ]
+    }
+}
