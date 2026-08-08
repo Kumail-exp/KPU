@@ -1,8 +1,9 @@
 &height=31
 &width=31
+&paddle_length=5
 # paddle
 ldi r1 16
-ldi r2 3 #length of the paddle
+ldi r2 &paddle_length #length of the paddle
 #ball
 ldi r8 10 #x
 ldi r9 16 #y
@@ -52,11 +53,17 @@ $event_handle(){
     #erasing the extra
     # idk why it requires two erasing but thats okayy
     sub r30 r1 r2
+    ldi r0 1
+    mov r20 r2
     add r30 r30 r3
-    ldi r0 0
-    setpixel r30 r4 r0
-    add r30 r30 r3
-    setpixel r30 r4 r0
+    .clear
+        setpixel r30 r4 r0
+        add r30 r30 r3
+        sub r20 r20 r3
+        cmp r20 r3
+        jc z .endclear
+        jump .clear
+    .endclear
     .end
 }
 $ball_move(){
@@ -102,6 +109,9 @@ $handle_collisions(){
         mult r11 r11 r13
         # incrementing score
         add r14 r14 r3
+        # making it a lil harder
+        ldi r0 8
+        sub r12 r12 r0
         jump .done
     .reversex
         mult r10 r10 r13
@@ -114,7 +124,7 @@ ldi r4 &height
 sub r4 r4 r3
 ldi r5 255
 ldi r7 25
-ldi r12 100
+ldi r12 200
 ldi r13 -1
 ldi r14 0
 .loop
@@ -124,6 +134,9 @@ ldi r14 0
     gettime r0
     mod r0 r0 r7
     jc z .update
+    gettime r0
+    mod r0 r0 r12
+    jc z .ballupdate
     jump .loop
 
     .update
@@ -131,6 +144,7 @@ ldi r14 0
     mod r0 r0 r12
     jc z .ballupdate
     .backfromball
+
     event_handle()
     drawpaddle(r6,r5)
     handle_collisions()
