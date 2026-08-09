@@ -129,7 +129,7 @@ class Assembler:
     def __init__(self,code:str):
         self.code:list[str]=[]
         for i in code.split('\n'):
-            self.code.append(i)
+            self.code.append(i.strip())
         self.labels:dict[str,int]={}
         self.macros={}
         self.globals={}
@@ -323,16 +323,16 @@ class Assembler:
                 return [[OPCODES[opcode],0,0]+[0]*16]
             raise ValueError(f"unknown opcode \'{opcode}\'")
         except Exception as e:
-            print(f'error in line->{line}')
+            print(f'error in line->"{line}"')
             print(e)
             raise
     def assemble(self,debug_mode=False)->list[list[int]]:
         '''no need for anything this just returns the perfectly done machine code'''
-        self.preprocess(False,True)
+        self.preprocess(False)
         self.expand()
         # print("\n".join(self.code))
         # since we need to process the labels inside the macros
-        self.preprocess()
+        self.preprocess(expand_prints=True)
         # print(self.globals)
         # print(self.labels)
         out=[]
