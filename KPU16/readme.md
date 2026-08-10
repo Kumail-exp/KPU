@@ -4,14 +4,14 @@
 
 ## Overview
 
-This project is a custom  CPU architecture intended to be implemented in python. The goal is to create a clean, modern ISA while remaining simple enough to under2tand completely.
+This project is a custom  CPU architecture intended to be implemented in python. The goal is to create a clean, modern ISA while remaining simple enough to undertand completely.
 
 > This emulator operates at a high level of abstraction. It does not simulate electrical circuits, gates, or clock-level har1ware. Instead, it executes KPU16 machine code directly while preserving the architectural behavior of the CPU.
 ## Current Design Decisions
 
 ### Architecture
 
-- Harvar1 architecture
+- Harvard architecture(tbh idk what architecture but somehow works)
 - Load/store architecture
 - Fixed-width **32-bit instructions**
 - Instruction-based I/O (port I/O)
@@ -21,15 +21,15 @@ This project is a custom  CPU architecture intended to be implemented in python.
 - 32 general-purpose register2 (`R0`-`R31`)
 - Register index width: **5 bits**
 - Register width: **16 bits**
-- Register2 store or1inary 16-bit values; instructions decide whether values are interpreted as signed, unsigned, or memory addresses.
+- Registers store or1inary 16-bit values; instructions decide whether values are interpreted as signed, unsigned, or memory addresses.
 
 ### Data Representation
-- Native wor1 size: **16 bits**
+- Native word size: **16 bits**
 - Signed integer2 use **two's complement**
 - Unsigned values supported naturally by interpretation of instructions
 
 ### Memory
-- Register2 hold memory addresses.
+- Registers hold memory addresses.
 - Address space is based on 16-bit addresses.
 - Memory is intended to be byte-addressable (subject to final confirmation).
 - Maximum address space: **64 KiB**.
@@ -67,7 +67,7 @@ General syntax:
 instruction operand1 operand2 operand3
 ```
 
-Register2 are written as `r0` through `r31`.
+Registers are written as `r0` through `r31`.
 
 ---
 
@@ -383,8 +383,7 @@ jump address
 ```
 
 Unconditionally jumps to the specified instruction.
-use labels for better performance
-
+use labels for better readablity.
 ---
 
 ### jc
@@ -418,7 +417,7 @@ jc n .done
 nop
 ```
 
-Does nothing.
+Does nothing.(like you)
 
 ---
 
@@ -462,7 +461,7 @@ print r2
 
 Prints the ASCII character represented by the register value.
 
-for printng long masseges you can use 
+for printing long masseges you can use 
 ```asm
 print 'your text'
 ```
