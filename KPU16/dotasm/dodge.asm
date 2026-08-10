@@ -79,9 +79,18 @@ $update_player(){
 
     key r30 KEY_RIGHT
     add r1 r1 r30
-
     key r30 KEY_LEFT
     sub r1 r1 r30
+
+    ldi r0 -1
+    cmp r1 r0
+    jc z .negate
+    jump .nocap
+    .negate
+        ldi r1 0
+    .nocap
+    ldi r0 &width
+    min r1 r1 r0
 
     ldi r0 255
     setpixel r1 r2 r0
