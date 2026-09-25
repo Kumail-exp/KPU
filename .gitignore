@@ -3,7 +3,6 @@ __pycache__/
 
 *.ods#
 *.jpg
-*.kpu
 *.vsix
 
 badapple.asm
